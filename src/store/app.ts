@@ -15,21 +15,32 @@ export enum LanguagesType {
   ZH = 'zh',
 }
 
+export enum ModelType {
+  GPT4 = 'GPT-4',
+  GPT35 = 'GPT-3.5',
+  ChatGLMPro = 'ChatGLM-Pro',
+  ChatGLMStd = 'ChatGLM-Std',
+  ChatGLMLite = 'ChatGLM-Lite',
+}
+
 interface AppState {
   theme: ThemeModeType;
   language: LanguagesType;
   loginType: LoginTypeEnum;
   appConfig: AppConfigType;
+  model: ModelType;
   setTheme: (theme: ThemeModeType) => void;
   setAppConfig: (theme: AppConfigType) => void;
   setLanguage: (language: LanguagesType) => void;
   setLoginType: (loginType: LoginTypeEnum) => void;
+  setModel: (model: ModelType) => void;
 }
 
 const initialState = {
   theme: ThemeModeType.SYSTEM,
   language: LanguagesType.ZH,
   loginType: LoginTypeEnum.WECHAT,
+  model: ModelType.GPT35,
   appConfig: Object.create(null),
 };
 
@@ -50,6 +61,7 @@ export const useAppStore = create<AppState>()(
       setLanguage: (language: LanguagesType) => set({ language }),
       setLoginType: (loginType: LoginTypeEnum) => set({ loginType }),
       setAppConfig: (appConfig: AppConfigType) => set({ appConfig, loginType: appConfig.login_type }),
+      setModel: (model: ModelType) => set({ model }),
     }),
     {
       name: StoreKey.Config,

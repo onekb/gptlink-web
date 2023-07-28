@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { MoonIcon, Sun, Laptop, Languages, Github } from 'lucide-react';
 
-import { useAppStore, ThemeModeType, LanguagesType, useUserStore } from '@/store';
+import { useAppStore, ThemeModeType, LanguagesType, useUserStore, ModelType } from '@/store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -15,6 +15,16 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+} from '@/components/ui/select';
 
 export const ThemeMode = () => {
   const { t } = useTranslation();
@@ -85,6 +95,43 @@ export const SystemLanguages = () => {
   );
 };
 
+export const ModelSelect = () => {
+  const [model, setModel] = useAppStore((state) => [state.model, state.setModel])
+
+  const switchModel = (mode: ModelType) => {
+    localStorage.setItem('model-mode', mode);
+    setModel(mode);
+  };
+
+  useEffect(() => {
+    switchModel(model);
+  }, [])
+
+  return (
+    <Select onValueChange={(value: ModelType) => switchModel(value)} defaultValue={model}>
+      <SelectTrigger>
+        <SelectValue placeholder="请选择模型" />
+      </SelectTrigger>
+      <SelectContent className='bg-primary'>
+        <SelectGroup>
+          <SelectLabel>OpenAI</SelectLabel>
+          <SelectItem disabled={true} value={ModelType.GPT4}>GPT-4</SelectItem>
+          <SelectItem value={ModelType.GPT35}>GPT-3.5</SelectItem>
+        </SelectGroup>
+        <SelectSeparator />
+        <SelectGroup>
+          <SelectLabel>智谱AI</SelectLabel>
+          <SelectItem value={ModelType.ChatGLMPro}>ChatGLM-Pro</SelectItem>
+          <SelectItem value={ModelType.ChatGLMStd}>ChatGLM-Std</SelectItem>
+          <SelectItem value={ModelType.ChatGLMLite}>ChatGLM-Lite</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
+
+
 const UserDropDown = () => {
   const navigate = useNavigate();
   const [appConfig] = useAppStore((state) => [state.appConfig]);
@@ -126,7 +173,7 @@ const UserDropDown = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Button onClick={() => navigate('/login')}>去登陆</Button>
+        <Button onClick={() => navigate('/login')} style={{ whiteSpace: 'nowrap' }}>去登陆</Button>
       )}
     </>
   );
@@ -180,6 +227,7 @@ export default function Header({ isPlain = false }) {
       </div>
 
       <div className="flex items-center gap-2">
+        <ModelSelect />
         <Link to="https://github.com/gptlink/gptlink-web" target="_blank">
           <Button variant="ghost" className="p-0 px-2">
             <Github size={18} />

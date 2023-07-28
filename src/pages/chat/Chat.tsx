@@ -3,7 +3,7 @@ import { Loader2, PauseOctagon, SendIcon, Trash2Icon, DownloadIcon, MoreHorizont
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-import { useChatStore, useUserStore } from '@/store';
+import { useChatStore, useUserStore, useAppStore } from '@/store';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import IconSvg from '@/components/Icon';
@@ -49,6 +49,7 @@ const Footer = ({
     state.currentConversation,
     state.editConversation,
   ]);
+  const [model] = useAppStore((state) => [state.model]);
 
   const isMobileScreen = useMobileScreen();
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -67,7 +68,7 @@ const Footer = ({
     if (!currentChatData.length) {
       editConversation(currentConversation.uuid, { title: userInput });
     }
-    sendUserMessage(userInput);
+    sendUserMessage(userInput, model);
     setUserInput('');
     setTimeout(() => {
       textAreaRef.current?.focus();

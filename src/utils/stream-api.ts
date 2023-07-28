@@ -17,9 +17,10 @@ interface StreamResponseType {
 
 type SendMessageType = {
   message: string;
-  modelId?: string;
+  promptID?: string;
   requestId?: string;
   lastId?: string;
+  model?: string;
   onProgress: (_: StreamResponseType) => void;
   onFinish: (_: StreamResponseType) => void;
   onError: (_: string) => void;
@@ -43,7 +44,7 @@ export default class StreamAPI {
     this.status = StatusEnum.ABORT;
   }
 
-  async send({ message, modelId, requestId, lastId, onProgress, onFinish, onError }: SendMessageType) {
+  async send({ message, promptID, requestId, lastId, model, onProgress, onFinish, onError }: SendMessageType) {
     this.status = StatusEnum.START;
 
     const access_token = localStorage.getItem(StoreKey.AccessToken);
@@ -56,9 +57,10 @@ export default class StreamAPI {
       },
       body: JSON.stringify({
         message,
-        model_id: modelId,
+        prompt_id: promptID,
         request_id: requestId,
         last_id: lastId,
+        model,
       }),
     });
 

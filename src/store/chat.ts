@@ -9,7 +9,7 @@ export type ConversationType = {
   uuid: string;
   title: string;
   system: string;
-  modelId: string;
+  promptID: string;
 };
 
 export enum RoleTypeEnum {
@@ -27,6 +27,7 @@ export type ChatItemType = {
   messageId?: string;
   requestId: string;
   status?: StatusEnum;
+  model?: string;
 };
 
 interface ChatState {
@@ -34,17 +35,17 @@ interface ChatState {
   currentConversation: ConversationType;
   conversationList: ConversationType[];
   chatDataMap: Record<string, ChatItemType[]>;
-  addConversation: (title?: string, icon?: string, system?: string, modelId?: string) => void;
+  addConversation: (title?: string, icon?: string, system?: string, promptID?: string) => void;
   switchConversation: (id: string) => void;
   clearCurrentConversation: () => void;
   editConversation: (id: string, data: Partial<ConversationType>) => void;
   delConversation: (id: string) => void;
-  sendUserMessage: (message: string) => void;
+  sendUserMessage: (message: string, model: string) => void;
   regenerateChat: (requestId: string) => void;
   currentChatData: () => ChatItemType[];
   stopStream: () => void;
   setStream: (val: boolean) => void;
-  chatProgress: (message: string, requestId: string, lastId: string, chatIndex: number, id: string) => void;
+  chatProgress: (message: string, requestId: string, lastId: string, chatIndex: number, id: string, model?: string) => void;
 }
 
 const DefaultConversation = {
@@ -52,7 +53,7 @@ const DefaultConversation = {
   uuid: uuidv4(),
   title: '新话题',
   system: '',
-  modelId: '',
+  promptID: '',
 };
 
 const initialState = {
@@ -66,10 +67,10 @@ export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
       ...initialState,
-      addConversation(title = '新话题', icon = '', system = '', modelId = '') {
+      addConversation(title = '新话题', icon = '', system = '', promptID = '') {
         const uuid = uuidv4();
 
-        const newConversation = { title, uuid, icon, system, modelId };
+        const newConversation = { title, uuid, icon, system, promptID };
 
         set((state) => ({
           currentConversation: newConversation,
@@ -77,14 +78,14 @@ export const useChatStore = create<ChatState>()(
           chatDataMap: {
             [uuid]: system
               ? [
-                  {
-                    id: uuidv4(),
-                    text: system,
-                    role: RoleTypeEnum.SYSTEM,
-                    dateTime: new Date().toISOString(),
-                    requestId: '',
-                  },
-                ]
+                {
+                  id: uuidv4(),
+                  text: system,
+                  role: RoleTypeEnum.SYSTEM,
+                  dateTime: new Date().toISOString(),
+                  requestId: '',
+                },
+              ]
               : [],
             ...state.chatDataMap,
           },
@@ -138,7 +139,7 @@ export const useChatStore = create<ChatState>()(
           set({ currentConversation: newConversationList[0] });
         }
       },
-      chatProgress(message: string, requestId: string, lastId = '', chatIndex: number, id: string) {
+      chatProgress(message: string, requestId: string, lastId = '', chatIndex: number, id: string, model?: string) {
         const currentChatData = get().currentChatData();
         const chatData = get().currentChatData();
         const chatDataMap = get().chatDataMap;
@@ -147,9 +148,10 @@ export const useChatStore = create<ChatState>()(
 
         streamAPI.send({
           message: message,
-          modelId: get().currentConversation.modelId,
+          promptID: get().currentConversation.promptID,
           requestId,
           lastId,
+          model,
           onProgress: (data) => {
             currentChatData[currentChatData.length - 1] = {
               id,
@@ -180,14 +182,14 @@ export const useChatStore = create<ChatState>()(
           },
         });
       },
-      sendUserMessage(message: string) {
+      sendUserMessage(message: string, model: string) {
         const chatData = get().currentChatData();
         const requestId = uuidv4();
         const id = uuidv4();
 
         const newChatData = [
           ...chatData,
-          { text: message, role: RoleTypeEnum.USER, dateTime: new Date().toISOString(), requestId, id: uuidv4() },
+          { text: message, role: RoleTypeEnum.USER, dateTime: new Date().toISOString(), requestId, id: uuidv4(), model },
           {
             id,
             text: '',
@@ -204,7 +206,7 @@ export const useChatStore = create<ChatState>()(
 
         const lastId = chatData.filter((item) => item.role === RoleTypeEnum.ASSISTANT)?.pop()?.messageId || '';
 
-        get().chatProgress(message, requestId, lastId, newChatData.length - 1, id);
+        get().chatProgress(message, requestId, lastId, newChatData.length - 1, id, model);
       },
       regenerateChat(requestId) {
         const chatData = get().currentChatData();
