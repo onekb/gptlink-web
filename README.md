@@ -2,14 +2,14 @@
   <h1 align="center">GPTLink Web</h1>
   <p> 只需简单几步，即可基于 GPTLink 快速搭建你的 ChatGPT 站点。</p>
 
-[体验地址](https://gptlink-web.vercel.app) · [反馈](https://github.com/gptlink/gptlink-web/issues) · [微信加群](./docs/qrcode.png)
+[体验地址](https://gptlink-web.vercel.app) · [反馈](https://github.com/onekb/gptlink-web/issues) · [微信加群](./docs/qrcode.png)
 
   <img src="./docs/banner.png" />
 </div>
 
 ## 🎉 特性
 
-`GPTLink Web` 为 [gptlink](https://github.com/gptlink/gptlink) 项目用户端源码。可将此源码编译后后，替换 `gptlink/gptweb` 目录重新构建镜像，重新构建属于你的专属应用。
+`GPTLink Web` 为 [gptlink](https://github.com/onekb/gptlink) 项目用户端源码。可将此源码编译后后，替换 `gptlink/gptweb` 目录重新构建镜像，重新构建属于你的专属应用。
 
 - 接入 [GPTLink](https://gpt-link.com/) 接口, 内置丰富功能
 - 采用 `vite` + `react`, 开箱即用的极速开发体验
@@ -30,7 +30,7 @@ npm install pnpm -g
 - 获取项目代码
 
 ```shell
-git clone https://github.com/gptlink/gptlink-web
+git clone https://github.com/onekb/gptlink-web
 
 cd gptlink-web
 
@@ -45,6 +45,10 @@ pnpm run dev
 
 - [x] 导出聊天分享图片
 - [x] 移动端适配
+
+## TODO（[@onekb](https://github.com/onekb) ）
+- [x] Model切换
+- [ ] 本地知识库
 
 ## 项目
 
